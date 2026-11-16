@@ -85,13 +85,13 @@ gestao/
 
 Painel de controle com indicadores de produtos cadastrados, unidades disponíveis, valor estimado do estoque, gráfico de distribuição e alertas de produtos com estoque baixo.
 
-![Dashboard de Gestão de E-commerce](docs/screenshots/dashboard.png)
+![Dashboard administrativo](./docs/screenshots/dashboard.png)
 
 ### Cadastro de produtos
 
 Interface utilizada para cadastrar e editar produtos, com campos para nome, preço e quantidade em estoque.
 
-![Formulário de Cadastro de Produtos](docs/screenshots/formulario.png)
+![Cadastro de produtos](./docs/screenshots/formulario.png)
 
 ## Como executar o projeto
 
