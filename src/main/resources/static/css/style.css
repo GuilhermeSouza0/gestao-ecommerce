@@ -350,7 +350,7 @@ label {
 
 @media (max-width: 850px) {
     .cards-indicadores {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .area-analise {
@@ -375,6 +375,10 @@ label {
 
     h1 {
         font-size: 24px;
+    }
+
+    .cards-indicadores {
+        grid-template-columns: 1fr;
     }
 
     .barra-acoes {

@@ -99,7 +99,7 @@
 
                     <div class="barra-fundo">
                         <div class="barra-preenchimento"
-                             th:style="'width:' + ${(p.estoque != null ? p.estoque : 0) * 100.0 / maiorEstoque} + '%'">
+                             th:style="|width: ${(p.estoque != null ? p.estoque : 0) * 100.0 / maiorEstoque}%|">
                         </div>
                     </div>
 
@@ -151,18 +151,21 @@
             </div>
         </div>
 
+        <!-- PESQUISA -->
         <form class="barra-acoes"
               th:action="@{/produtos}"
               method="get">
 
             <input type="text"
                    name="nome"
+                   th:value="${param.nome}"
                    placeholder="Pesquisar produto pelo nome">
 
             <button type="submit">Pesquisar</button>
 
         </form>
 
+        <!-- TABELA -->
         <div class="tabela-responsiva">
 
             <table>
