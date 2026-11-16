@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de E-commerce</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Gestão de E-commerce</h1>
+    <p>Controle de produtos da loja virtual</p>
+
+    <p th:if="${mensagem}" th:text="${mensagem}"></p>
+
+    <form th:action="@{/produtos}" method="get">
+        <input name="nome" placeholder="Pesquisar produto">
+        <button>Pesquisar</button>
+        <a class="botao" th:href="@{/produtos/novo}">
+            Novo produto
+        </a>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Produto</th>
+            <th>Preço</th>
+            <th>Estoque</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="p : ${produtos}">
+            <td th:text="${p.id}"></td>
+            <td th:text="${p.nome}"></td>
+            <td th:text="${#numbers.formatCurrency(p.preco)}"></td>
+            <td th:text="${p.estoque}"></td>
+
+            <td>
+                <a th:href="@{/produtos/{id}/editar(id=${p.id})}">
+                    Editar
+                </a>
+
+                <form th:action="@{/produtos/{id}/excluir(id=${p.id})}"
+                      method="post" style="display:inline">
+
+                    <button class="excluir">Excluir</button>
+                </form>
+            </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(produtos)}">
+            <td colspan="5">Nenhum produto cadastrado.</td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>
