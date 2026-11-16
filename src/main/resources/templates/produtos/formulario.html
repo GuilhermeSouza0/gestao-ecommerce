@@ -11,7 +11,8 @@
 
     <h1>Cadastro de Produto</h1>
 
-    <form th:action="@{/produtos/salvar}"
+    <form class="form-produto"
+          th:action="@{/produtos/salvar}"
           th:object="${produto}" method="post">
 
         <input type="hidden" th:field="*{id}">

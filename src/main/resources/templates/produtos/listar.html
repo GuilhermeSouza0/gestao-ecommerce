@@ -1,63 +1,241 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Gestão de E-commerce</title>
+
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
+
 <body>
 
-<div class="container">
+<div class="container dashboard">
 
-    <h1>Gestão de E-commerce</h1>
-    <p>Controle de produtos da loja virtual</p>
+    <!-- CABEÇALHO -->
+    <header class="dashboard-header">
+        <div>
+            <span class="eyebrow">PAINEL ADMINISTRATIVO</span>
+            <h1>Gestão de E-commerce</h1>
+            <p>Acompanhe seus produtos e controle seu estoque.</p>
+        </div>
 
-    <p th:if="${mensagem}" th:text="${mensagem}"></p>
-
-    <form th:action="@{/produtos}" method="get">
-        <input name="nome" placeholder="Pesquisar produto">
-        <button>Pesquisar</button>
         <a class="botao" th:href="@{/produtos/novo}">
-            Novo produto
+            + Novo produto
         </a>
-    </form>
+    </header>
 
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Produto</th>
-            <th>Preço</th>
-            <th>Estoque</th>
-            <th>Ações</th>
-        </tr>
-        </thead>
+    <!-- MENSAGEM -->
+    <div class="mensagem"
+         th:if="${mensagem}"
+         th:text="${mensagem}">
+    </div>
 
-        <tbody>
-        <tr th:each="p : ${produtos}">
-            <td th:text="${p.id}"></td>
-            <td th:text="${p.nome}"></td>
-            <td th:text="${#numbers.formatCurrency(p.preco)}"></td>
-            <td th:text="${p.estoque}"></td>
+    <!-- INDICADORES -->
+    <section class="cards-indicadores">
 
-            <td>
-                <a th:href="@{/produtos/{id}/editar(id=${p.id})}">
-                    Editar
-                </a>
+        <article class="card-indicador">
+            <div class="indicador-topo">
+                <span>Produtos cadastrados</span>
+                <span class="icone">▦</span>
+            </div>
 
-                <form th:action="@{/produtos/{id}/excluir(id=${p.id})}"
-                      method="post" style="display:inline">
+            <strong th:text="${totalProdutos}">0</strong>
+            <small>Total de produtos na loja</small>
+        </article>
 
-                    <button class="excluir">Excluir</button>
-                </form>
-            </td>
-        </tr>
+        <article class="card-indicador">
+            <div class="indicador-topo">
+                <span>Unidades em estoque</span>
+                <span class="icone">▤</span>
+            </div>
 
-        <tr th:if="${#lists.isEmpty(produtos)}">
-            <td colspan="5">Nenhum produto cadastrado.</td>
-        </tr>
-        </tbody>
-    </table>
+            <strong th:text="${totalUnidades}">0</strong>
+            <small>Quantidade disponível</small>
+        </article>
+
+        <article class="card-indicador">
+            <div class="indicador-topo">
+                <span>Valor do estoque</span>
+                <span class="icone">R$</span>
+            </div>
+
+            <strong th:text="${#numbers.formatCurrency(valorTotalEstoque)}">
+                R$ 0,00
+            </strong>
+
+            <small>Valor estimado dos produtos</small>
+        </article>
+
+    </section>
+
+    <!-- GRÁFICO E ALERTA -->
+    <section class="area-analise">
+
+        <article class="painel-grafico">
+
+            <div class="titulo-secao">
+                <div>
+                    <h2>Estoque por produto</h2>
+                    <p>Distribuição das unidades disponíveis</p>
+                </div>
+            </div>
+
+            <div class="grafico">
+
+                <div class="barra-produto"
+                     th:each="p : ${dadosGrafico}">
+
+                    <div class="barra-info">
+                        <span th:text="${p.nome}">Produto</span>
+
+                        <strong th:text="${p.estoque != null ? p.estoque : 0}">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="barra-fundo">
+                        <div class="barra-preenchimento"
+                             th:style="'width:' + ${(p.estoque != null ? p.estoque : 0) * 100.0 / maiorEstoque} + '%'">
+                        </div>
+                    </div>
+
+                </div>
+
+                <p class="sem-dados"
+                   th:if="${#lists.isEmpty(dadosGrafico)}">
+                    Nenhum produto disponível para análise.
+                </p>
+
+            </div>
+
+        </article>
+
+        <!-- ALERTA DE ESTOQUE -->
+        <article class="painel-alerta">
+
+            <div class="titulo-secao">
+                <div>
+                    <h2>Atenção ao estoque</h2>
+                    <p>Produtos com 5 unidades ou menos</p>
+                </div>
+            </div>
+
+            <div class="alerta-numero">
+                <strong th:text="${estoqueBaixo}">0</strong>
+                <span>produtos precisam de atenção</span>
+            </div>
+
+            <div th:if="${estoqueBaixo == 0}" class="estado-ok">
+                Estoque dentro do limite definido.
+            </div>
+
+            <div th:if="${estoqueBaixo > 0}" class="estado-alerta">
+                Existem produtos com estoque baixo.
+            </div>
+
+        </article>
+
+    </section>
+
+    <!-- TABELA DE PRODUTOS -->
+    <section class="painel-tabela">
+
+        <div class="titulo-secao">
+            <div>
+                <h2>Produtos cadastrados</h2>
+                <p>Gerencie os produtos da sua loja virtual.</p>
+            </div>
+        </div>
+
+        <form class="barra-acoes"
+              th:action="@{/produtos}"
+              method="get">
+
+            <input type="text"
+                   name="nome"
+                   placeholder="Pesquisar produto pelo nome">
+
+            <button type="submit">Pesquisar</button>
+
+        </form>
+
+        <div class="tabela-responsiva">
+
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Produto</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Situação</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="p : ${produtos}">
+
+                    <td th:text="${p.id}"></td>
+
+                    <td class="nome-produto"
+                        th:text="${p.nome}">
+                    </td>
+
+                    <td th:text="${#numbers.formatCurrency(p.preco)}"></td>
+
+                    <td th:text="${p.estoque}"></td>
+
+                    <td>
+                        <span th:if="${p.estoque != null and p.estoque <= 5}"
+                              class="status-baixo">
+                            Estoque baixo
+                        </span>
+
+                        <span th:if="${p.estoque == null or p.estoque > 5}"
+                              class="status-normal">
+                            Disponível
+                        </span>
+                    </td>
+
+                    <td class="acoes">
+
+                        <a th:href="@{/produtos/{id}/editar(id=${p.id})}"
+                           class="editar">
+                            Editar
+                        </a>
+
+                        <form th:action="@{/produtos/{id}/excluir(id=${p.id})}"
+                              method="post"
+                              style="display:inline">
+
+                            <button type="submit" class="excluir">
+                                Excluir
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(produtos)}">
+                    <td colspan="6" class="sem-dados">
+                        Nenhum produto encontrado.
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </section>
 
 </div>
 
